@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Device Migration Runbook</title>
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html{
+scroll-behavior:smooth;
+}
+
+body{
+
+font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+background:#eef2f7;
+color:#333;
+
+}
+
+a{
+text-decoration:none;
+color:inherit;
+}
+
+header{
+
+position:fixed;
+top:0;
+left:0;
+right:0;
+height:75px;
+
+background:#0f4c81;
+color:white;
+
+display:flex;
+align-items:center;
+justify-content:space-between;
+
+padding:20px 35px;
+
+box-shadow:0 4px 12px rgba(0,0,0,.15);
+
+z-index:1000;
+
+}
+
+header h1{
+
+font-size:28px;
+font-weight:600;
+
+}
+
+header p{
+
+font-size:13px;
+opacity:.85;
+
+}
+
+.header-left{
+
+display:flex;
+flex-direction:column;
+
+}
+
+.search-box{
+
+width:350px;
+position:relative;
+
+}
+
+.search-box input{
+
+width:100%;
+padding:12px 18px;
+border:none;
+border-radius:8px;
+font-size:15px;
+
+outline:none;
+
+}
+
+.sidebar{
+
+position:fixed;
+
+top:75px;
+left:0;
+
+bottom:0;
+
+width:260px;
+
+background:#1b2638;
+color:white;
+
+overflow:auto;
+
+padding:25px 15px;
+
+}
+
+.sidebar h3{
+
+margin-bottom:20px;
+font-size:18px;
+
+border-bottom:1px solid rgba(255,255,255,.15);
+padding-bottom:12px;
+
+}
+
+.sidebar ul{
+
+list-style:none;
+
+}
+
+.sidebar li{
+
+margin-bottom:10px;
+
+}
+
+.sidebar a{
+
+display:block;
+
+padding:12px 15px;
+
+border-radius:8px;
+
+transition:.25s;
+
+}
+
+.sidebar a:hover{
+
+background:#2f4f6d;
+
+}
+
+main{
+
+margin-left:280px;
+padding:100px 35px 50px;
+
+}
+
+.section{
+
+margin-bottom:60px;
+
+}
+
+.section-title{
+
+font-size:30px;
+margin-bottom:20px;
+
+color:#0f4c81;
+
+display:flex;
+align-items:center;
+gap:10px;
+
+}
+
+.section-description{
+
+margin-bottom:25px;
+font-size:15px;
+color:#555;
+
+}
+
+.card{
+
+background:white;
+
+border-radius:12px;
+
+padding:24px;
+
+margin-bottom:25px;
+
+box-shadow:0 5px 18px rgba(0,0,0,.08);
+
+transition:.25s;
+
+}
+
+.card:hover{
+
+transform:translateY(-3px);
+
+}
+
+.step-header{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+margin-bottom:15px;
+
+}
+
+.step-title{
+
+font-size:21px;
+font-weight:600;
+
+color:#0f4c81;
+
+}
+
+.badge{
+
+padding:6px 12px;
+border-radius:30px;
+
+font-size:12px;
+font-weight:600;
+
+color:white;
+
+}
+
+.badge.user{
+
+background:#2196f3;
+
+}
+
+.badge.tech{
+
+background:#009688;
+
+}
+
+.badge.critical{
+
+background:#d32f2f;
+
+}
+
+.badge.wait{
+
+background:#ff9800;
+
+}
+
+.badge.reboot{
+
+background:#6a1b9a;
+
+}
+
+.badge.verify{
+
+background:#2e7d32;
+
+}
+
+.card ul{
+
+margin-left:20px;
+margin-top:10px;
+
+}
+
+.card li{
+
+margin-bottom:10px;
+line-height:1.7;
+
+}
+
+.alert{
+
+padding:15px 18px;
+
+border-left:6px solid;
+
+border-radius:8px;
+
+margin-top:20px;
+margin-bottom:20px;
+
+}
+
+.alert.info{
+
+background:#e8f4ff;
+border-color:#2196f3;
+
+}
+
+.alert.warning{
+
+background:#fff3cd;
+border-color:#ff9800;
+
+}
+
+.alert.danger{
+
+background:#fdecea;
+border-color:#d32f2f;
+
+}
+
+.alert.success{
+
+background:#e9f7ef;
+border-color:#28a745;
+
+}
+
+.alert strong{
+
+display:block;
+margin-bottom:8px;
+
+}
+
+.code-box{
+
+background:#202124;
+
+color:#8cff9e;
+
+padding:16px;
+
+border-radius:8px;
+
+font-family:Consolas,monospace;
+
+position:relative;
+
+margin-top:15px;
+margin-bottom:15px;
+
+overflow:auto;
+
+}
+
+.copy-btn{
+
+position:absolute;
+
+right:12px;
+top:12px;
+
+background:#1976d2;
+color:white;
+
+border:none;
+
+padding:7px 12px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+font-size:12px;
+
+}
+
+.copy-btn:hover{
+
+background:#0d47a1;
+
+}
+
+.checklist{
+
+margin-top:20px;
+
+}
+
+.checklist label{
+
+display:block;
+
+margin-bottom:12px;
+
+cursor:pointer;
+
+}
+
+.checklist input{
+
+margin-right:10px;
+
+transform:scale(1.2);
+
+}
+
+.footer-space{
+
+height:50px;
+
+}
+
+@media(max-width:900px){
+
+.sidebar{
+
+display:none;
+
+}
+
+main{
+
+margin-left:0;
+
+padding:100px 20px;
+
+}
+
+.search-box{
+
+width:100%;
+
+margin-top:15px;
+
+}
+
+header{
+
+height:auto;
+
+flex-direction:column;
+
+align-items:flex-start;
+
+gap:15px;
+
+padding:20px;
+
+}
+
+}
+
+@media print{
+
+.sidebar,
+.search-box,
+.copy-btn{
+
+display:none;
+
+}
+
+header{
+
+position:relative;
+
+}
+
+main{
+
+margin:0;
+padding:20px;
+
+}
+
+.card{
+
+box-shadow:none;
+border:1px solid #ddd;
+
+page-break-inside:avoid;
+
+}
+
+body{
+
+background:white;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="header-left">
+
+<h1>🖥 Device Migration Runbook</h1>
+
+<p>Level 1 Service Desk • Desktop Support Engineers</p>
+
+</div>
+
+<div class="search-box">
+
+<input
+type="text"
+id="searchInput"
+placeholder="Search Trellix, Quest, Intune, Printer, Registry..."
+>
+
+</div>
+
+</header>
+
+<nav class="sidebar">
+
+<h3>Navigation</h3>
+
+<ul>
+
+<li><a href="#prereq">📋 Pre-Requisites</a></li>
+
+<li><a href="#cutover">🔄 During Cutover</a></li>
+
+<li><a href="#post">✅ Post Migration</a></li>
+
+<li><a href="#validation">✔ Validation Checklist</a></li>
+
+</ul>
+
+</nav>
+
+<main id="content">
+
+<section
+class="section"
+id="prereq">
+
+<h2 class="section-title">
+📋 Pre-Requisites
+</h2>
+
+<p class="section-description">
+Complete the following activities before initiating the device migration.
+</p>
+
+<!-- ========================================================= -->
+<!--                     PART 2 OF 6                            -->
+<!--            PRE-REQUISITES (STEPS 1 - 6)                    -->
+<!-- ========================================================= -->
+
+<div class="card searchable">
+
+<div class="step-header">
+<div class="step-title">
+Step 1 - Collect User & Device Information
+</div>
+
+<span class="badge tech">
+Technician Action
+</span>
+
+</div>
+
+<p>
+Collect and verify the required details before initiating the migration.
+</p>
+
+<ul>
+
+<li>User Full Name</li>
+
+<li>Username</li>
+
+<li>Email Address</li>
+
+<li>Hostname / Computer Name</li>
+
+<li>Asset Tag (if applicable)</li>
+
+<li>Current IP Address (optional)</li>
+
+<li>Current OU / Device Status (if required)</li>
+
+</ul>
+
+<div class="alert info">
+
+<strong>Information</strong>
+
+Ensure the correct user and corresponding device are selected for migration to avoid account mapping issues.
+
+</div>
+
+</div>
+
+
+
+<div class="card searchable">
+
+<div class="step-header">
+
+<div class="step-title">
+
+Step 2 - Disable Trellix Single Sign-On (SSO)
+
+</div>
+
+<span class="badge critical">
+
+Critical
+
+</span>
+
+</div>
+
+<p>
+
+Disable Trellix Single Sign-On (SSO) for the user before beginning the migration.
+
+</p>
+
+<div class="alert warning">
+
+<strong>Important</strong>
+
+Failure to disable Trellix SSO may prevent successful authentication after the migration.
+
+</div>
+
+</div>
+
+
+
+<div class="card searchable">
+
+<div class="step-header">
+
+<div class="step-title">
+
+Step 3 - Close All Applications
+
+</div>
+
+<span class="badge user">
+
+User Action
+
+</span>
+
+</div>
+
+<p>
+
+Request the user to save all work and completely close every application.
+
+</p>
+
+<ul>
+
+<li>Microsoft Outlook</li>
+
+<li>Microsoft Teams</li>
+
+<li>OneDrive</li>
+
+<li>Office Applications</li>
+
+<li>VPN Clients</li>
+
+<li>Browsers</li>
+
+<li>Any applications with unsaved work</li>
+
+</ul>
+
+<div class="alert danger">
+
+<strong>Warning</strong>
+
+Unsaved work may be permanently lost during the migration and mandatory system reboots.
+
+</div>
+
+</div>
+
+
+
+<div class="card searchable">
+
+<div class="step-header">
+
+<div class="step-title">
+
+Step 4 - Verify Network Connectivity
+
+</div>
+
+<span class="badge critical">
+
+Critical
+
+</span>
+
+</div>
+
+<p>
+
+Ensure the laptop is connected directly to the corporate office network.
+
+</p>
+
+<ul>
+
+<li>Office LAN Connection (Preferred)</li>
+
+<li>Office Wi-Fi</li>
+
+<li>Disconnect VPN before starting</li>
+
+</ul>
+
+<div class="alert danger">
+
+<strong>Do NOT</strong>
+
+Do not perform the migration while connected through VPN.
+
+</div>
+
+<div class="alert success">
+
+<strong>Requirement</strong>
+
+The laptop must remain connected to the Office Network throughout the migration process.
+
+</div>
+
+</div>
+
+
+
+<div class="card searchable">
+
+<div class="step-header">
+
+<div class="step-title">
+
+Step 5 - Configure Power Options
+
+</div>
+
+<span class="badge tech">
+
+Technician Action
+
+</span>
+
+</div>
+
+<p>
+
+Configure the Windows Power Plan to prevent the device from entering Sleep mode.
+
+</p>
+
+<ul>
+
+<li>Open <b>Control Panel</b></li>
+
+<li>Select <b>Power Options</b></li>
+
+<li>Choose <b>Balanced</b></li>
+
+<li>Select <b>Change Plan Settings</b></li>
+
+<li>Configure <b>Turn off display</b> as required</li>
+
+<li>Set <b>Put the computer to sleep</b> = <b>Never</b></li>
+
+</ul>
+
+<div class="alert warning">
+
+<strong>Important</strong>
+
+The device must remain powered on during the complete migration process.
+
+</div>
+
+</div>
+
+
+
+<div class="card searchable">
+
+<div class="step-header">
+
+<div class="step-title">
+
+Step 6 - Verify Quest On Demand Migration Agent
+
+</div>
+
+<span class="badge tech">
+
+Technician Action
+
+</span>
+
+</div>
+
+<p>
+
+Verify whether the Quest On Demand Migration Agent is already installed.
+
+</p>
+
+<h4 style="margin-top:20px;">6.1 Check Installed Programs</h4>
+
+<ul>
+
+<li>Press <b>Win + R</b></li>
+
+<li>Run <b>appwiz.cpl</b></li>
+
+<li>Verify whether the Quest On Demand Migration for Active Directory Agent exists.</li>
+
+</ul>
+
+<div class="code-box">
+
+appwiz.cpl
+
+<button class="copy-btn">
+Copy
+</button>
+
+</div>
+
+<div class="alert info">
+
+<strong>If the agent exists</strong>
+
+Proceed to the next migration step.
+
+</div>
+
+<div class="alert warning">
+
+<strong>If the agent is NOT installed</strong>
+
+Follow the installation procedure below.
+
+</div>
+
+<h4 style="margin-top:20px;">
+6.2 Copy Quest Agent
+</h4>
+
+<p>
+
+Browse to the following shared folder.
+
+</p>
+
+<div class="code-box">
+
+\\10.175.5.89\QuestODM\2 Mindsprint
+
+<button class="copy-btn">
+Copy
+</button>
+
+</div>
+
+<p>
+
+Copy the entire <b>Quest-ODM</b> folder to:
+
+</p>
+
+<div class="code-box">
+
+C:\
+
+<button class="copy-btn">
+Copy
+</button>
+
+</div>
+
+<h4 style="margin-top:20px;">
+6.3 Install the Agent
+</h4>
+
+<p>
+
+Navigate to:
+
+</p>
+
+<div class="code-box">
+
+C:\Quest-ODM
+
+<button class="copy-btn">
+Copy
+</button>
+
+</div>
+
+<p>
+
+Run the following as <b>Administrator</b>.
+
+</p>
+
+<div class="code-box">
+
+MS-AD-Install.bat
+
+<button class="copy-btn">
+Copy
+</button>
+
+</div>
+
+<h4 style="margin-top:20px;">
+6.4 Refresh the Agent
+</h4>
+
+<p>
+
+After successful installation, execute:
+
+</p>
+
+<div class="code-box">
+
+Registry_repair.bat
+
+<button class="copy-btn">
+Copy
+</button>
+
+</div>
+
+<div class="alert success">
+
+<strong>Success Criteria</strong>
+
+Quest On Demand Migration Agent is installed and refreshed successfully.
+
+</div>
+
+</div>
+
+</section>
+
+<section
+class="section"
+id="cutover">
+
+<h2 class="section-title">
+
+🔄 During Cutover
+
+</h2>
+
+<p class="section-description">
+
+Perform the following activities during the scheduled migration window.
+
+</p>
+<!--==================== PART 3 OF 6 ====================-->
+
+<div class="card searchable">
+<div class="step-header">
+<div class="step-title">Step 7 - Refresh Quest ODM Agent (If Required)</div>
+<span class="badge tech">Technician Action</span>
+</div>
+<p>If instructed by the Migration Team, refresh the Quest On Demand Migration Agent.</p>
+<p>Navigate to:</p>
+<div class="code-box">C:\Quest-ODM<button class="copy-btn">Copy</button></div>
+<p>Run the following as <b>Administrator</b>.</p>
+<div class="code-box">Registry_repair.bat<button class="copy-btn">Copy</button></div>
+<div class="alert warning">
+<strong>Important</strong>
+Run this step only when explicitly instructed by the Migration Team.
+</div>
+</div>
+
+<div class="card searchable">
+<div class="step-header">
+<div class="step-title">Step 8 - Device Migration & Reboots</div>
+<span class="badge reboot">Reboot Required</span>
+</div>
+<p>The migration process will automatically reboot the device twice.</p>
+<h4>First Reboot</h4>
+<ul>
+<li>Allow the reboot to complete.</li>
+<li>Log in to Windows using the existing credentials.</li>
+<li>Do not interrupt the migration process.</li>
+</ul>
+<h4>Second Reboot</h4>
+<ul>
+<li>Disable Trellix Single Sign-On.</li>
+<li>Connect to the corporate Wi-Fi.</li>
+<li>Authenticate using <b>Mindsprint.local\username</b>.</li>
+<li>Sign in to Windows using <b>Mindsprint.local\username</b>.</li>
+</ul>
+<div class="alert danger">
+<strong>Warning</strong>
+Do not power off the laptop or disconnect it from the corporate network during either reboot.
+</div>
+<div class="alert success">
+<strong>Success Criteria</strong>
+The user successfully logs in using the new Active Directory credentials.
+</div>
+</div>
+
+<div class="card searchable">
+<div class="step-header">
+<div class="step-title">Step 9 - Configure Microsoft 365 Applications</div>
+<span class="badge user">User Action</span>
+</div>
+<p>Sign in to all Microsoft 365 applications using the new <b>mindsprint.com</b> account.</p>
+<ul>
+<li>Microsoft Outlook</li>
+<li>Microsoft Teams</li>
+<li>Microsoft OneDrive</li>
+<li>Microsoft Office Apps (Word, Excel, PowerPoint, etc.)</li>
+</ul>
+<div class="alert info">
+<strong>Information</strong>
+Verify that Outlook mailbox loads successfully and OneDrive begins syncing before proceeding.
+</div>
+</div>
+
+<div class="card searchable">
+<div class="step-header">
+<div class="step-title">Step 10 - Configure Microsoft Edge Profile</div>
+<span class="badge user">User Action</span>
+</div>
+<p>Launch Microsoft Edge and configure the browser profile.</p>
+<ul>
+<li>Sign in using the <b>mindsprint.com</b> account.</li>
+<li>Enable profile synchronization.</li>
+<li>Verify bookmarks and settings begin synchronizing.</li>
+</ul>
+<div class="alert success">
+<strong>Verification</strong>
+The Edge profile displays the new organizational account and synchronization status is active.
+</div>
+</div>
+
+</section>
+
+<section class="section" id="post">
+<h2 class="section-title">✅ Post Migration</h2>
+<p class="section-description">Complete the remaining post-migration activities before handing the device back to the user.</p>
+
+<!--==================== PART 4 OF 6 ====================-->
+
+<div class="card searchable">
+<div class="step-header">
+<div class="step-title">Step 11 - Configure Network Printer</div>
+<span class="badge tech">Technician Action</span>
+</div>
+<p>Configure the network printer using the Print Management Portal.</p>
+<p>Open the following URL in a browser:</p>
+<div class="code-box">https://inchn-print01:8082/login/company<button class="copy-btn">Copy</button></div>
+<ul>
+<li>Sign in using <b>Mindsprint.local</b> credentials.</li>
+<li>Create a new Printer PIN if prompted.</li>
+<li>Install the required printer(s).</li>
+<li>Print a test page to verify successful configuration.</li>
+</ul>
+<div class="alert info">
+<strong>Information</strong>
+Ensure the user can authenticate successfully before installing printers.
+</div>
+<div class="alert success">
+<strong>Verification</strong>
+Required printers are visible and a test print completes successfully.
+</div>
+</div>
+
+<div class="card searchable">
+<div class="step-header">
+<div class="step-title">Step 12 - Remove Stale Entra Device Registrations</div>
+<span class="badge tech">Technician Action</span>
+</div>
+<p>Remove obsolete Entra registrations associated with the migrated user.</p>
+<ul>
+<li>Open the Microsoft Intune Admin Center.</li>
+<li>Locate the migrated user.</li>
+<li>Review all associated Windows devices.</li>
+<li>Identify duplicate or stale Entra registrations.</li>
+<li>Delete only obsolete registrations after confirming the active migrated device.</li>
+</ul>
+<div class="alert warning">
+<strong>Important</strong>
+Verify the active Hybrid Entra joined device before removing any stale registrations.
+</div>
+<div class="alert success">
+<strong>Verification</strong>
+Only the current migrated device remains associated with the user.
+</div>
+</div>
+
+<div class="card searchable">
+<div class="step-header">
+<div class="step-title">Step 13 - Trellix Authentication</div>
+<span class="badge critical">Critical</span>
+</div>
+<p>Continue using manual authentication for Trellix until the migration team confirms ePO migration completion.</p>
+<ul>
+<li>Launch Trellix.</li>
+<li>Keep Single Sign-On disabled.</li>
+<li>Authenticate manually using the assigned credentials.</li>
+<li>Continue this process until official confirmation is received from Satya.</li>
+</ul>
+<div class="alert danger">
+<strong>Do Not</strong>
+Do not enable Trellix Single Sign-On until the ePO migration has been officially completed.
+</div>
+<div class="alert info">
+<strong>Migration Dependency</strong>
+Await confirmation from Satya before enabling Trellix SSO.
+</div>
+</div>
+
+<div class="card searchable">
+<div class="step-header">
+<div class="step-title">Step 14 - Verify Hybrid Entra Join & Intune Enrollment</div>
+<span class="badge verify">Verification</span>
+</div>
+<p>Confirm successful Microsoft Hybrid Entra Join and Intune enrollment.</p>
+<ul>
+<li>Verify the device is Hybrid Entra Joined.</li>
+<li>Confirm Intune enrollment is successful.</li>
+<li>Ensure policy synchronization has completed.</li>
+<li>Confirm compliance status.</li>
+<li>Obtain final confirmation from <b>Prashanth N</b>.</li>
+</ul>
+<div class="alert success">
+<strong>Success Criteria</strong>
+The migrated device appears in Microsoft Intune as Hybrid Entra Joined and compliant.
+</div>
+<div class="alert warning">
+<strong>Note</strong>
+Do not close the migration ticket until enrollment has been verified.
+</div>
+</div>
+
+</section>
+
+<section class="section" id="validation">
+<h2 class="section-title">✔ Migration Validation Checklist</h2>
+<p class="section-description">Complete the following validation checks before handing the laptop back to the user.</p>
+
+<div class="card">
+
+<div class="checklist">
+
+<label><input type="checkbox">User can sign in using Mindsprint.local credentials</label>
+
+<label><input type="checkbox">Corporate Wi-Fi connectivity verified</label>
+
+<label><input type="checkbox">Microsoft Outlook configured and mailbox accessible</label>
+
+<label><input type="checkbox">Microsoft Teams signed in successfully</label>
+
+<label><input type="checkbox">OneDrive signed in and synchronization started</label>
+
+<label><input type="checkbox">Microsoft Edge profile configured and syncing</label>
+
+<label><input type="checkbox">Required network printers installed</label>
+
+<label><input type="checkbox">Quest ODM Agent installed and refreshed</label>
+
+<label><input type="checkbox">Stale Entra registrations removed</label>
+
+<label><input type="checkbox">Trellix manual authentication verified</label>
+
+<label><input type="checkbox">Hybrid Entra Join verified</label>
+
+<label><input type="checkbox">Microsoft Intune enrollment successful</label>
+
+<label><input type="checkbox">Compliance policies received</label>
+
+<label><input type="checkbox">Migration confirmed by Prashanth N</label>
+
+<label><input type="checkbox">Laptop handed back to the user</label>
+
+</div>
+
+</div>
+
+<!--==================== PART 5 OF 6 ====================-->
+
+<script>
+
+document.addEventListener("DOMContentLoaded",function(){
+
+const searchInput=document.getElementById("searchInput");
+const cards=document.querySelectorAll(".searchable");
+
+searchInput.addEventListener("keyup",function(){
+
+const value=this.value.toLowerCase();
+
+cards.forEach(function(card){
+
+if(card.innerText.toLowerCase().indexOf(value)>-1){
+card.style.display="block";
+}else{
+card.style.display="none";
+}
+
+});
+
+});
+
+const copyButtons=document.querySelectorAll(".copy-btn");
+
+copyButtons.forEach(function(button){
+
+button.addEventListener("click",function(){
+
+const text=this.parentElement.childNodes[0].textContent.trim();
+
+navigator.clipboard.writeText(text);
+
+const original=this.innerText;
+
+this.innerText="Copied!";
+
+setTimeout(()=>{
+
+this.innerText=original;
+
+},1500);
+
+});
+
+});
+
+const navLinks=document.querySelectorAll(".sidebar a");
+
+window.addEventListener("scroll",function(){
+
+let current="";
+
+document.querySelectorAll("section").forEach(function(section){
+
+const sectionTop=section.offsetTop-120;
+
+if(pageYOffset>=sectionTop){
+
+current=section.getAttribute("id");
+
+}
+
+});
+
+navLinks.forEach(function(link){
+
+link.style.background="transparent";
+
+if(link.getAttribute("href")==="#"+current){
+
+link.style.background="#2f4f6d";
+
+}
+
+});
+
+});
+
+const checkboxes=document.querySelectorAll(".checklist input[type='checkbox']");
+
+checkboxes.forEach(function(box,index){
+
+const key="MigrationChecklist_"+index;
+
+if(localStorage.getItem(key)==="true"){
+
+box.checked=true;
+
+}
+
+box.addEventListener("change",function(){
+
+localStorage.setItem(key,box.checked);
+
+});
+
+});
+
+});
+
+</script>
+
+<div class="footer-space"></div>
+
+<!--==================== PART 6 OF 6 (OPTIONAL ENHANCEMENTS) ====================-->
+
+<div class="card" style="margin-top:30px;">
+<div class="step-header">
+<div class="step-title">📞 Escalation Contacts</div>
+<span class="badge verify">Reference</span>
+</div>
+<table style="width:100%;border-collapse:collapse;">
+<tr style="background:#f5f7fa;">
+<th style="padding:10px;text-align:left;border:1px solid #ddd;">Area</th>
+<th style="padding:10px;text-align:left;border:1px solid #ddd;">Primary Contact</th>
+<th style="padding:10px;text-align:left;border:1px solid #ddd;">Remarks</th>
+</tr>
+<tr>
+<td style="padding:10px;border:1px solid #ddd;">Migration Coordination</td>
+<td style="padding:10px;border:1px solid #ddd;">Migration Team</td>
+<td style="padding:10px;border:1px solid #ddd;">Migration scheduling & execution</td>
+</tr>
+<tr>
+<td style="padding:10px;border:1px solid #ddd;">Hybrid Entra Join / Intune</td>
+<td style="padding:10px;border:1px solid #ddd;">Prashanth N</td>
+<td style="padding:10px;border:1px solid #ddd;">Enrollment verification</td>
+</tr>
+<tr>
+<td style="padding:10px;border:1px solid #ddd;">Trellix ePO</td>
+<td style="padding:10px;border:1px solid #ddd;">Satya</td>
+<td style="padding:10px;border:1px solid #ddd;">SSO enablement confirmation</td>
+</tr>
+</table>
+</div>
+
+<div class="card">
+<div class="step-header">
+<div class="step-title">📌 Quick Reference</div>
+<span class="badge tech">Reference</span>
+</div>
+
+<table style="width:100%;border-collapse:collapse;">
+<tr style="background:#f5f7fa;">
+<th style="padding:10px;border:1px solid #ddd;text-align:left;">Item</th>
+<th style="padding:10px;border:1px solid #ddd;text-align:left;">Value</th>
+</tr>
+
+<tr>
+<td style="padding:10px;border:1px solid #ddd;">Quest Share</td>
+<td style="padding:10px;border:1px solid #ddd;"><code>\\10.175.5.89\QuestODM\2 Mindsprint</code></td>
+</tr>
+
+<tr>
+<td style="padding:10px;border:1px solid #ddd;">Quest Folder</td>
+<td style="padding:10px;border:1px solid #ddd;"><code>C:\Quest-ODM</code></td>
+</tr>
+
+<tr>
+<td style="padding:10px;border:1px solid #ddd;">Install Script</td>
+<td style="padding:10px;border:1px solid #ddd;"><code>MS-AD-Install.bat</code></td>
+</tr>
+
+<tr>
+<td style="padding:10px;border:1px solid #ddd;">Refresh Script</td>
+<td style="padding:10px;border:1px solid #ddd;"><code>Registry_repair.bat</code></td>
+</tr>
+
+<tr>
+<td style="padding:10px;border:1px solid #ddd;">Printer Portal</td>
+<td style="padding:10px;border:1px solid #ddd;"><code>https://inchn-print01:8082/login/company</code></td>
+</tr>
+
+</table>
+
+</div>
+
+<footer style="margin-top:40px;padding:20px;border-top:1px solid #dcdcdc;text-align:center;color:#666;font-size:13px;">
+<b>Device Migration Runbook</b><br>
+Version 1.0<br>
+Prepared for Level 1 Service Desk & Desktop Support Engineers
+</footer>
+
+</main>
+</body>
+</html>
