@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domain Cutover – June 13–14 | Mindsprint</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --brand:       #0057B8;
+    --brand-deep:  #003D82;
+    --brand-pale:  #EBF2FC;
+    --accent:      #00B4A0;
+    --accent-pale: #E6F7F5;
+    --warn:        #E85D26;
+    --warn-pale:   #FDF0EB;
+    --ink:         #1A1D23;
+    --muted:       #5A6070;
+    --rule:        #DDE2EC;
+    --surface:     #F7F9FD;
+    --white:       #FFFFFF;
+    --radius:      8px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--ink);
+    background: var(--surface);
+  }
+
+  /* ── HEADER ── */
+  .site-header {
+    background: var(--white);
+    border-bottom: 1px solid var(--rule);
+    position: sticky; top: 0; z-index: 100;
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .site-header .logo {
+    font-size: 1.05rem; font-weight: 700; letter-spacing: -.3px;
+    color: var(--brand);
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .site-header .logo span { color: var(--ink); }
+  .header-badge {
+    font-size: .72rem; font-weight: 600; letter-spacing: .5px;
+    text-transform: uppercase;
+    background: var(--brand); color: var(--white);
+    padding: .25rem .65rem; border-radius: 20px;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--brand-deep) 0%, var(--brand) 60%, #0090c8 100%);
+    color: var(--white);
+    padding: 4rem 2rem 3.5rem;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent 0px,
+      transparent 28px,
+      rgba(255,255,255,.03) 28px,
+      rgba(255,255,255,.03) 30px
+    );
+  }
+  .hero-inner { position: relative; max-width: 760px; margin: 0 auto; }
+  .hero-eyebrow {
+    font-size: .75rem; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; opacity: .75;
+    margin-bottom: .75rem;
+  }
+  .hero h1 {
+    font-size: clamp(1.75rem, 4vw, 2.6rem);
+    font-weight: 700; line-height: 1.2;
+    margin-bottom: .85rem;
+  }
+  .hero h1 em { font-style: normal; color: #6ECFF6; }
+  .hero-sub {
+    font-size: 1rem; opacity: .85;
+    max-width: 580px; margin: 0 auto 2rem;
+  }
+  .hero-date-pill {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    backdrop-filter: blur(4px);
+    padding: .55rem 1.2rem; border-radius: 30px;
+    font-size: .9rem; font-weight: 500;
+  }
+  .hero-date-pill svg { flex-shrink: 0; }
+
+  /* ── LAYOUT ── */
+  .page-wrap { max-width: 900px; margin: 0 auto; padding: 2.5rem 2rem 4rem; }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: .7rem; font-weight: 700; letter-spacing: 1.8px;
+    text-transform: uppercase; color: var(--brand);
+    margin-bottom: .5rem;
+  }
+
+  /* ── TABS ── */
+  .tab-strip {
+    display: flex; gap: .35rem;
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: .35rem;
+    margin-bottom: 1.75rem;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex: 1; min-width: 130px;
+    background: none; border: none; cursor: pointer;
+    padding: .6rem 1rem;
+    border-radius: 5px;
+    font-size: .82rem; font-weight: 600; color: var(--muted);
+    transition: all .18s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { background: var(--surface); color: var(--ink); }
+  .tab-btn.active { background: var(--brand); color: var(--white); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .card h3 {
+    font-size: .95rem; font-weight: 700; color: var(--ink);
+    margin-bottom: .75rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .card h3 .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--brand); flex-shrink: 0;
+  }
+
+  /* ── CHANGE TABLE ── */
+  .change-table {
+    width: 100%; border-collapse: collapse;
+    font-size: .875rem;
+  }
+  .change-table th {
+    text-align: left; padding: .6rem .9rem;
+    background: var(--brand); color: var(--white);
+    font-size: .78rem; font-weight: 600; letter-spacing: .4px;
+    text-transform: uppercase;
+  }
+  .change-table th:first-child { border-radius: 6px 0 0 0; }
+  .change-table th:last-child  { border-radius: 0 6px 0 0; }
+  .change-table td {
+    padding: .65rem .9rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .change-table tr:last-child td { border-bottom: none; }
+  .change-table tr:nth-child(even) td { background: var(--surface); }
+  .mono {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .82em; color: var(--brand-deep);
+    background: var(--brand-pale); padding: .1em .35em; border-radius: 3px;
+  }
+  .arrow { color: var(--muted); margin: 0 .3rem; }
+
+  /* ── ALERT BOX ── */
+  .alert {
+    border-radius: var(--radius);
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    display: flex; gap: .85rem; align-items: flex-start;
+  }
+  .alert.info   { background: var(--brand-pale); border-left: 4px solid var(--brand); }
+  .alert.warn   { background: var(--warn-pale);  border-left: 4px solid var(--warn);  }
+  .alert.accent { background: var(--accent-pale); border-left: 4px solid var(--accent); }
+  .alert-icon { font-size: 1.1rem; line-height: 1.5; flex-shrink: 0; }
+  .alert p { font-size: .875rem; color: var(--ink); margin: 0; }
+  .alert strong { font-weight: 600; display: block; margin-bottom: .2rem; }
+
+  /* ── STEP LIST ── */
+  .step-list { list-style: none; padding: 0; }
+  .step-list li {
+    display: flex; gap: 1rem; align-items: flex-start;
+    padding: .65rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: .875rem;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--brand); color: var(--white);
+    font-size: .75rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: .05rem;
+  }
+
+  /* ── CHECKLIST ── */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    display: flex; gap: .75rem;
+    padding: .55rem 0;
+    border-bottom: 1px solid var(--rule);
+    font-size: .875rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check-box {
+    width: 20px; height: 20px; border-radius: 4px;
+    border: 2px solid var(--rule);
+    flex-shrink: 0; margin-top: .1rem;
+    cursor: pointer; transition: all .15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .check-box.checked { background: var(--accent); border-color: var(--accent); }
+  .check-box.checked::after {
+    content: '';
+    width: 5px; height: 9px;
+    border: 2px solid white; border-top: none; border-left: none;
+    transform: rotate(45deg) translateY(-1px);
+    display: block;
+  }
+  .checklist li.done span { text-decoration: line-through; color: var(--muted); }
+
+  /* ── APP GRID ── */
+  .app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: .75rem;
+    margin-top: .75rem;
+  }
+  .app-chip {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: .6rem .85rem;
+    font-size: .82rem; font-weight: 500;
+    display: flex; align-items: center; gap: .5rem;
+    color: var(--ink);
+  }
+  .app-chip::before {
+    content: '';
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent); flex-shrink: 0;
+  }
+
+  /* ── SUPPORT BOX ── */
+  .support-box {
+    background: linear-gradient(135deg, var(--brand-pale), var(--accent-pale));
+    border: 1px solid var(--rule);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-align: center;
+    margin-top: 2rem;
+  }
+  .support-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+  .support-box p { font-size: .875rem; color: var(--muted); margin-bottom: 1rem; }
+  .contact-links { display: flex; gap: .75rem; flex-wrap: wrap; justify-content: center; }
+  .contact-links a {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .55rem 1.1rem; border-radius: 6px;
+    background: var(--brand); color: var(--white);
+    font-size: .82rem; font-weight: 600;
+    text-decoration: none; transition: background .15s;
+  }
+  .contact-links a:hover { background: var(--brand-deep); }
+
+  /* ── SECTION H2 ── */
+  .section-heading {
+    font-size: 1.05rem; font-weight: 700;
+    color: var(--ink); margin-bottom: 1rem;
+    padding-bottom: .5rem;
+    border-bottom: 2px solid var(--brand-pale);
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .hero { padding: 3rem 1.25rem 2.5rem; }
+    .page-wrap { padding: 1.5rem 1rem 3rem; }
+    .tab-btn { min-width: 100px; }
+  }
+
+  /* ── ANIMATION ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-inner { animation: fadeUp .5s ease both; }
+  .card, .alert { animation: fadeUp .4s ease both; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="20" height="20" rx="4" fill="#0057B8"/>
+      <rect x="4" y="4" width="5" height="5" rx="1" fill="white"/>
+      <rect x="11" y="4" width="5" height="5" rx="1" fill="#6ECFF6"/>
+      <rect x="4" y="11" width="5" height="5" rx="1" fill="#6ECFF6"/>
+      <rect x="11" y="11" width="5" height="5" rx="1" fill="white"/>
+    </svg>
+    Mindsprint <span>&nbsp;IT Communications</span>
+  </div>
+  <span class="header-badge">Action Required</span>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Tenant Separation Program</p>
+    <h1>Domain Cutover:<br><em>mindsprint.com</em></h1>
+    <p class="hero-sub">The mindsprint.com domain is moving to the Digital Tenant. Review what's changing, what you need to do, and when.</p>
+    <div class="hero-date-pill">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+      Migration Window: June 13–14, 2025
+    </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main class="page-wrap">
+
+  <!-- TAB NAV -->
+  <div class="tab-strip" role="tablist">
+    <button class="tab-btn active" onclick="switchTab('everyone')" role="tab">Everyone Else</button>
+    <button class="tab-btn" onclick="switchTab('ofi')" role="tab">OFI-IEO Users</button>
+    <button class="tab-btn" onclick="switchTab('digital')" role="tab">Digital Tenant</button>
+    <button class="tab-btn" onclick="switchTab('checklist')" role="tab">Checklist</button>
+  </div>
+
+  <!-- ─── TAB: EVERYONE ELSE ─── -->
+  <div id="tab-everyone" class="tab-panel active">
+
+    <div class="section-label">What's changing for you</div>
+    <h2 class="section-heading">Shared Tenant → Digital Tenant</h2>
+
+    <div class="card">
+      <h3><span class="dot"></span>Email Identity Change</h3>
+      <table class="change-table">
+        <thead>
+          <tr><th>Before Cutover</th><th>After Cutover</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="mono">@mindsprint.com</span></td>
+            <td><span class="mono">@mindsprint.org</span></td>
+            <td>Old address retained for reference only</td>
+          </tr>
+          <tr>
+            <td>New emails to your inbox</td>
+            <td>Auto-forwarded from <span class="mono">mindsprint.org</span></td>
+            <td>No action needed for mail routing</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert warn">
+      <span class="alert-icon">⚠️</span>
+      <p><strong>Do not send emails from the mindsprint.org mailbox.</strong>
+      It is retained for historical reference only. All outgoing mail must use your new <span class="mono">mindsprint.com</span> address in the Digital Tenant.</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="dot"></span>Email Routing After Cutover</h3>
+      <ul class="step-list">
+        <li>
+          <span class="step-num">1</span>
+          <span>New emails are delivered to your <strong>mindsprint.com</strong> mailbox in the Digital Tenant.</span>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <span>The <strong>mindsprint.org</strong> mailbox remains accessible for viewing historical emails — no sending.</span>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <span>Automatic forwarding is enabled: any mail sent to your old address is routed to the new one.</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="section-label" style="margin-top:2rem">Application access</div>
+    <h2 class="section-heading">Apps Requiring Your New Identity</h2>
+    <div class="card">
+      <h3><span class="dot"></span>Use <span class="mono">mindsprint.com</span> to sign in to:</h3>
+      <div class="app-grid">
+        <div class="app-chip">DarwinBox</div>
+        <div class="app-chip">SAP Grow</div>
+        <div class="app-chip">MoveInSync</div>
+        <div class="app-chip">Freshworks</div>
+        <div class="app-chip">Allsec</div>
+      </div>
+      <p style="margin-top:1rem; font-size:.85rem; color:var(--muted);">
+        If you encounter access issues after cutover, contact the migration support team immediately.
+      </p>
+    </div>
+
+    <div class="section-label" style="margin-top:2rem">Accessing mailboxes</div>
+    <h2 class="section-heading">Outlook Access During Transition</h2>
+    <div class="alert info">
+      <span class="alert-icon">💡</span>
+      <p><strong>Recommended:</strong> Use Outlook Web Access (OWA) or New Outlook during the transition period for the most reliable experience.</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;" class="mailbox-grid">
+      <div class="card">
+        <h3><span class="dot" style="background:var(--muted)"></span>Old Mailbox (Reference Only)</h3>
+        <ol class="step-list">
+          <li><span class="step-num">1</span><span>Open Microsoft Edge</span></li>
+          <li><span class="step-num">2</span><span>Select the <strong>olamnet.com</strong> profile</span></li>
+          <li><span class="step-num">3</span><span>Open the M365 App Launcher (9-dot menu)</span></li>
+          <li><span class="step-num">4</span><span>Select <strong>Outlook</strong></span></li>
+          <li><span class="step-num">5</span><span>View historical emails as needed</span></li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3><span class="dot" style="background:var(--accent)"></span>New Mailbox (Active)</h3>
+        <ol class="step-list">
+          <li><span class="step-num">1</span><span>Open Microsoft Edge</span></li>
+          <li><span class="step-num">2</span><span>Select the <strong>mindsprint.com</strong> profile</span></li>
+          <li><span class="step-num">3</span><span>Open the M365 App Launcher (9-dot menu)</span></li>
+          <li><span class="step-num">4</span><span>Select <strong>Outlook</strong></span></li>
+          <li><span class="step-num">5</span><span>Send and receive using your new address</span></li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:2rem">Microsoft Teams</div>
+    <h2 class="section-heading">Teams After Cutover</h2>
+    <div class="card">
+      <h3><span class="dot"></span>Use the Mindsprint Digital Teams Profile</h3>
+      <p style="font-size:.875rem; margin-bottom:.85rem; color:var(--muted);">
+        All future chats and collaboration should use the Mindsprint Teams profile. The Olam International profile should not be used for ongoing conversations.
+      </p>
+      <ul class="step-list">
+        <li><span class="step-num" style="background:var(--warn)">!</span><span><strong>Save "You" chat messages</strong> from the Olam International Teams profile by <strong>June 30</strong> — these will not be migrated. Use OneNote, Word, or approved storage.</span></li>
+        <li><span class="step-num">2</span><span>Historical chats are being migrated and will appear gradually in your Digital Teams profile.</span></li>
+        <li><span class="step-num">3</span><span>Existing meeting links, channels, memberships, and files remain intact.</span></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ─── TAB: OFI-IEO ─── -->
+  <div id="tab-ofi" class="tab-panel">
+
+    <div class="section-label">What's changing for you</div>
+    <h2 class="section-heading">OFI Supporting IEO Users</h2>
+
+    <div class="alert warn">
+      <span class="alert-icon">⚠️</span>
+      <p><strong>Your email changes to ofi.com.</strong>
+      Your current <span class="mono">mindsprint.com</span> address moves to <span class="mono">ofi.com</span>. You will have two separate workspaces after cutover.</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem" class="mailbox-grid">
+      <div class="card">
+        <h3><span class="dot" style="background:#0057B8"></span>OFI Workspace</h3>
+        <ul class="step-list">
+          <li><span class="step-num">🖥</span><span><strong>Device:</strong> Laptop</span></li>
+          <li><span class="step-num">@</span><span><strong>Primary Identity:</strong> <span class="mono">ofi.com</span></span></li>
+        </ul>
+        <div class="alert info" style="margin-top:.75rem; margin-bottom:0">
+          <span class="alert-icon">ℹ️</span>
+          <p>Use <span class="mono">ofi.com</span> exclusively for OFI-related communications.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3><span class="dot" style="background:var(--accent)"></span>Mindsprint Workspace</h3>
+        <ul class="step-list">
+          <li><span class="step-num">☁</span><span><strong>Device:</strong> Cloud PC</span></li>
+          <li><span class="step-num">@</span><span><strong>Primary Identity:</strong> <span class="mono">mindsprint.com</span></span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:2rem">Accessing Mindsprint email</div>
+    <h2 class="section-heading">Two Ways to Access Your Mindsprint Account</h2>
+
+    <div class="card">
+      <h3><span class="dot"></span>Option 1 — Outlook Web Access (OWA)</h3>
+      <p style="font-size:.875rem; color:var(--muted);">Go to <a href="https://outlook.office.com" target="_blank" style="color:var(--brand)">outlook.office.com</a> and sign in using your <span class="mono">mindsprint.com</span> identity.</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="dot"></span>Option 2 — Cloud PC via Windows App</h3>
+      <ol class="step-list">
+        <li><span class="step-num">1</span><span>Open <strong>Windows App</strong> from Windows Search on your laptop.</span></li>
+        <li><span class="step-num">2</span><span>Sign in using your <span class="mono">mindsprint.com</span> account.</span></li>
+        <li><span class="step-num">3</span><span>Access Outlook and other Mindsprint applications from within the Cloud PC.</span></li>
+      </ol>
+    </div>
+
+    <div class="section-label" style="margin-top:2rem">Email routing</div>
+    <h2 class="section-heading">Mail Routing for OFI-IEO Users</h2>
+    <div class="card">
+      <table class="change-table">
+        <thead>
+          <tr><th>Scenario</th><th>Outcome</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Emails sent to your old <span class="mono">mindsprint.com</span></td>
+            <td>Auto-forwarded to your <span class="mono">ofi.com</span> mailbox</td>
+          </tr>
+          <tr>
+            <td>OFI-related communications</td>
+            <td>Use <span class="mono">ofi.com</span> exclusively</td>
+          </tr>
+          <tr>
+            <td>Mindsprint apps (DarwinBox, SAP etc.)</td>
+            <td>Access via Cloud PC with <span class="mono">mindsprint.com</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ─── TAB: DIGITAL TENANT ─── -->
+  <div id="tab-digital" class="tab-panel">
+
+    <div class="section-label">What's changing</div>
+    <h2 class="section-heading">Digital Tenant Users (mindsprint.digital)</h2>
+
+    <div class="alert accent">
+      <span class="alert-icon">✅</span>
+      <p><strong>Your identity is being upgraded to mindsprint.com.</strong>
+      Both your Email Address and User Principal Name (UPN) will change simultaneously during the cutover window.</p>
+    </div>
+
+    <div class="card">
+      <h3><span class="dot"></span>Identity Changes</h3>
+      <table class="change-table">
+        <thead>
+          <tr><th>Attribute</th><th>Before</th><th>After</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Email Address</td>
+            <td><span class="mono">name@mindsprint.digital</span></td>
+            <td><span class="mono">name@mindsprint.com</span></td>
+          </tr>
+          <tr>
+            <td>User Principal Name (UPN)</td>
+            <td><span class="mono">name@mindsprint.digital</span></td>
+            <td><span class="mono">name@mindsprint.com</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3><span class="dot"></span>Edge Profile to Update</h3>
+      <p style="font-size:.875rem; color:var(--muted); margin-bottom:.85rem">Ensure both profiles exist in Microsoft Edge. After cutover, the <span class="mono">mindsprint.digital</span> profile will reflect as <span class="mono">mindsprint.com</span>.</p>
+      <div class="app-grid">
+        <div class="app-chip">olamnet.com profile</div>
+        <div class="app-chip">mindsprint.com profile</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3><span class="dot"></span>What Continues to Work</h3>
+      <ul class="step-list">
+        <li><span class="step-num">✓</span><span>Existing Teams meeting links and channels</span></li>
+        <li><span class="step-num">✓</span><span>Teams memberships, files, and federation</span></li>
+        <li><span class="step-num">✓</span><span>OneDrive and SharePoint access</span></li>
+        <li><span class="step-num">✓</span><span>MFA registrations (no re-registration needed)</span></li>
+        <li><span class="step-num">✓</span><span>Conditional access and device compliance policies</span></li>
+      </ul>
+    </div>
+
+    <div class="alert info">
+      <span class="alert-icon">🔐</span>
+      <p><strong>One-time sign-in expected.</strong> After the cutover you may be prompted to re-authenticate in Outlook, Teams, OneDrive, and Edge. This is a one-time prompt — existing MFA remains valid.</p>
+    </div>
+
+  </div>
+
+  <!-- ─── TAB: CHECKLIST ─── -->
+  <div id="tab-checklist" class="tab-panel">
+
+    <div class="section-label">Before June 13</div>
+    <h2 class="section-heading">Pre-Cutover Checklist</h2>
+
+    <div class="card">
+      <ul class="checklist" id="checklistItems">
+        <li onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span>Verify both Microsoft Edge profiles are configured: <strong>olamnet.com</strong> and <strong>mindsprint.digital / mindsprint.com</strong>.</span>
+        </li>
+        <li onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span>Review the Outlook and Teams transition guidance for your user category.</span>
+        </li>
+        <li onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span>Save important content from your Teams <strong>"You"</strong> self-chat before <strong>June 30</strong> (OneNote, Word, or approved storage).</span>
+        </li>
+        <li onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span>Confirm your post-cutover email identity with your manager if unsure of your user category.</span>
+        </li>
+        <li onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span>Note the migration support contacts and keep them accessible over the weekend.</span>
+        </li>
+        <li onclick="toggleCheck(this)">
+          <div class="check-box"></div>
+          <span>Expect a one-time sign-in prompt after the domain transition completes.</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="alert accent">
+      <span class="alert-icon">📅</span>
+      <p><strong>Key deadline — June 30:</strong> Teams "You" chat messages in the Olam International profile will not be migrated. Save any important notes before this date.</p>
+    </div>
+
+    <div class="section-label" style="margin-top:2rem">Edge profiles</div>
+    <h2 class="section-heading">Verify Your Edge Profiles</h2>
+    <div class="card">
+      <p style="font-size:.875rem;margin-bottom:.85rem;color:var(--muted)">Both profiles below should be present in Microsoft Edge. If either is missing, follow the Edge Profile Configuration Guide from the migration team.</p>
+      <div class="app-grid">
+        <div class="app-chip">olamnet.com</div>
+        <div class="app-chip">mindsprint.digital → mindsprint.com</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SUPPORT -->
+  <div class="support-box">
+    <h3>Need Help?</h3>
+    <p>Dedicated hypercare support is available throughout the migration weekend and post-cutover period.</p>
+    <div class="contact-links">
+      <a href="mailto:it4ms-infra-support@mindsprint.com">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        it4ms-infra-support
+      </a>
+      <a href="mailto:migration_teaminfra@mindsprint.com">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        migration_teaminfra
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  function switchTab(id) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) => {
+      b.classList.toggle('active', ['everyone','ofi','digital','checklist'][i] === id);
+    });
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+  }
+
+  function toggleCheck(li) {
+    const box = li.querySelector('.check-box');
+    const span = li.querySelector('span');
+    box.classList.toggle('checked');
+    li.classList.toggle('done');
+  }
+
+  // Responsive mailbox grid
+  function adjustGrid() {
+    document.querySelectorAll('.mailbox-grid').forEach(g => {
+      g.style.gridTemplateColumns = window.innerWidth < 580 ? '1fr' : '1fr 1fr';
+    });
+  }
+  window.addEventListener('resize', adjustGrid);
+  adjustGrid();
+</script>
+</body>
+</html>
